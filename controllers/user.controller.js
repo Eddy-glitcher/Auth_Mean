@@ -1,15 +1,26 @@
 const { response } = require("express");
-const { imageValidator } = require("../helper/image-validator");
 const UserSchema   = require("../models/user.model");
 const bcrypt       = require("bcrypt");
 
 const getUsers = async(req, res = response)=>{
+    const getUsersFrom = Number(req.query.from) || 0;
     try {
-        const user = await UserSchema.find();
+
+        const [ users, usersCountList] = await Promise.all([
+            UserSchema.find({}, 'name email image')
+            .skip(getUsersFrom)
+            .limit(5),
+
+            // Para retornar el conteo de los usuarios encontrados en la db.
+            UserSchema.countDocuments()
+        ]);
+
+        
         return res.status(200).json({
             ok  : true,
             msj : 'Usuarios consultados correctamente!',
-            user
+            users,
+            usersCountList
         });
     } catch (error) {
         return res.status(500).json({
