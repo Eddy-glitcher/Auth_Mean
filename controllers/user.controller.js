@@ -32,22 +32,10 @@ const getUsers = async(req, res = response)=>{
 };
 
 const createUser = async(req, res = response)=>{
-    const { image, email, password } = req.body;
+    const { email, password } = req.body;
 
     try {
 
-        // Verificamos que la imagen sea válida
-
-        if(image){
-            const isImageValid = imageValidator(image);
-            
-            if(!isImageValid){
-                return res.status(400).json({
-                    ok  : false,
-                    msj : 'La imagen enviada no es válida, debe ser jpg/jpeg/png/avif'
-                });
-            };
-        };
 
         // Verificamos que no exista otro usuario con el mismo email
         const userExists = await UserSchema.findOne({email: email});
@@ -85,20 +73,8 @@ const createUser = async(req, res = response)=>{
 const updateUser = async(req, res = response) => {
 
     const uid   = req.params.id;
-    const image = req.body.image;
 
     try {
-
-        if(image){
-            const isImageValid = imageValidator(image);
-            
-            if(!isImageValid){
-                return res.status(400).json({
-                    ok  : false,
-                    msj : 'La imagen enviada no es válida, debe ser jpg/jpeg/png/avif'
-                });
-            };
-        };
 
         const userExists = await UserSchema.findById(uid);
 

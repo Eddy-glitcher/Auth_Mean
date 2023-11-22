@@ -24,20 +24,8 @@ const createDoctor = async(req, res = response) => {
 
     const uid   = req.uid;
     const hid   = req.body.hospital;
-    const image = req.body.image;
 
     try {
-
-        if(image){
-            const isImageValid = imageValidator(image);
-            
-            if(!isImageValid){
-                return res.status(400).json({
-                    ok  : false,
-                    msj : 'La imagen enviada no es válida, debe ser jpg/jpeg/png/avif'
-                });
-            };
-        };
 
         const hospitalExists = await HospitalSchema.findById(hid);
 
@@ -48,7 +36,13 @@ const createDoctor = async(req, res = response) => {
             });
         };
 
-        const doctor = new DoctorSchema({ user : uid, ...req.body});
+        const createDoctor = {
+            ...req.body,
+            user : uid,
+            hospital : hid
+        };
+
+        const doctor = new DoctorSchema(createDoctor);
         await doctor.save();
         
         return res.status(200).json({
@@ -69,20 +63,9 @@ const updateDoctor = async(req, res = response) => {
 
     const did   = req.params.id;
     const hid   = req.body.hospital;
-    const image = req.body.image;
+    const uid   = req.uid;
 
     try {
-
-        if(image){
-            const isImageValid = imageValidator(image);
-            
-            if(!isImageValid){
-                return res.status(400).json({
-                    ok  : false,
-                    msj : 'La imagen enviada no es válida, debe ser jpg/jpeg/png/avif'
-                });
-            };
-        };
 
         const doctorExists = await DoctorSchema.findById(did);
 
@@ -102,7 +85,13 @@ const updateDoctor = async(req, res = response) => {
             });
         };
 
-        const doctor = await DoctorSchema.findByIdAndUpdate(did,{user : req.uid, ...req.body}, {new : true});
+        const updateDoctor = {
+            ...req.body,
+            user : uid,
+            hospital : hid
+        };
+
+        const doctor = await DoctorSchema.findByIdAndUpdate(did, updateDoctor, {new : true});
         
         return res.status(200).json({
             ok  : true,

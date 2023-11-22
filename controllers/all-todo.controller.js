@@ -73,7 +73,6 @@ const uploadFile = async(req, res = response) => {
     const dbTable = req.params.table;
     const image   = req.files.image;
 
-
     try {
 
         if(!req.files || Object.keys(req.files).length === 0){

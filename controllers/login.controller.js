@@ -3,6 +3,7 @@ const UserSchema       = require("../models/user.model");
 const bcrypt           = require("bcrypt");
 const { jwtGenerator } = require("../helper/jwt-generator");
 const { googleVerify } = require("../helper/google-verify");
+const jwt          = require("jsonwebtoken");
 
 const login = async(req, res = response) => {
     try {
@@ -87,7 +88,28 @@ const googleSingIn = async(req, res = response) => {
     };
 };
 
+const renewToken = async(req, res = response) => {
+    const uid = req.uid;
+
+    try {
+        const token = await jwtGenerator(uid);
+
+        return res.status(200).json({
+            ok  : true,
+            msj : 'Token válido',
+            token
+        });
+    } catch (error) {
+        return res.status(200).json({
+            ok  : false,
+            msj : 'Error al verificar el token'
+        });
+    };
+
+};
+
 module.exports = {
     login,
-    googleSingIn
+    googleSingIn,
+    renewToken
 };

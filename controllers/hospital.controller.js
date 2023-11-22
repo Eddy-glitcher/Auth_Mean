@@ -23,22 +23,15 @@ const getHospitals = async(req, res = response) => {
 const createHospital = async(req, res = response) => {
 
     const uid   = req.uid;
-    const image = req.body.image;
 
     try {
 
-        if(image){
-            const isImageValid = imageValidator(image);
-            
-            if(!isImageValid){
-                return res.status(400).json({
-                    ok  : false,
-                    msj : 'La imagen enviada no es válida, debe ser jpg/jpeg/png/avif'
-                });
-            };
+        const createHospital = {
+            ...req.body,
+            user : uid
         };
 
-        const hospital = new HospitalSchema({ user: uid, ...req.body});
+        const hospital = new HospitalSchema(createHospital);
         await hospital.save();
 
         return res.status(201).json({
@@ -58,20 +51,9 @@ const createHospital = async(req, res = response) => {
 const updateHospital = async(req, res = response) => {
 
     const hid   = req.params.id;
-    const image = req.body.image;
+    const uid   = req.uid;
     
     try {
-
-        if(image){
-            const isImageValid = imageValidator(image);
-            
-            if(!isImageValid){
-                return res.status(400).json({
-                    ok  : false,
-                    msj : 'La imagen enviada no es válida, debe ser jpg/jpeg/png/avif'
-                });
-            };
-        };
 
         const hospitalExists = await HospitalSchema.findById(hid);
 
@@ -82,7 +64,12 @@ const updateHospital = async(req, res = response) => {
             });
         };
 
-        const hospital = await HospitalSchema.findByIdAndUpdate(hid, req.body, {new : true});
+        const updateHospital = {
+            ...req.body,
+            user : uid
+        };
+
+        const hospital = await HospitalSchema.findByIdAndUpdate(hid, updateHospital, {new : true});
 
         return res.status(200).json({
             ok  : true,
@@ -112,6 +99,7 @@ const deleteHospital = async(req, res = response) => {
             });
         };
 
+        // No deberiamos eliminarlo completamente de la base de datos, deberiamos usar un propiedad de activo e inactivo en ls db
         const hospital = await HospitalSchema.findByIdAndDelete(hid);
 
         return res.status(200).json({
